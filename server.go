@@ -26,6 +26,8 @@ func main() {
 	g := e.Group("/wallet")
 	{
 		g.POST("/register", controllers.Register)
+		// file 是个大坑
+		// 方便自动二次拉取
 		g.Static("/html", "./wallet_front_end")
 	}
 	// 网页的静态文件
