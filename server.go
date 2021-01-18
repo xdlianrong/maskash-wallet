@@ -26,7 +26,7 @@ func main() {
 	g := e.Group("/wallet")
 	{
 		g.POST("/register", controllers.Register)
-		g.File("/html", "./html/main.html")
+		g.Static("/html", "./wallet_front_end")
 	}
 	// 网页的静态文件
 	// 启动服务，平滑关闭
