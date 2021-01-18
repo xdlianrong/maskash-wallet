@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="utf-8">
+        <title>wallet</title>
+        <link rel="stylesheet" href="./index.css">
+    </head>
+    <body>
+        <div id="app"> 
+            <!-- body下最上面的子元素的 margin 会导致 body 整体下移 -->
+            <p style="text-align: center; margin-top: 0;">这里会有一些提示</p>
+            <p style="text-align: center;">一些提示</p>
+            <p style="text-align: center;">些提示</p>
+            <p style="text-align: center;">提示</p>
+            <p style="text-align: center;">示</p>
+            <p style="text-align: center;">...</p>
+            <el-row type="flex" justify="center">
+                <el-col :xs="20" :sm="15" :md="12" :lg="8" :xl="7">
+                    <p>姓名：</p>
+                    <el-input maxlength="12" v-model="name" minlength="1"></el-input>
+                    <p>身份证号：</p>
+                    <el-input maxlength="18" minlength="18" v-model="id" value="number"></el-input>
+                    <p>自定义字符串：</p>
+                    <el-input maxlength="255" v-model="string" minlength="1"></el-input>
+                    <div class="button">创建钱包</div>
+                </el-col>
+            </el-row>
+        </div>
+    </body>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0; 
+            padding: 0;
+        }
+
+        #app {
+            width: 80%;
+            top: 40%;
+            position: relative;
+            transform: translateY(-50%);
+            margin-left: 10%;
+        }
+
+        .button {
+            font-size: 1.2rem;
+            text-align: center;
+            background: #59aafa;
+            border-radius: 4px;
+            border: #f2f2f2 10px solid;
+            margin-top: 2.5rem;
+            color: white;
+            line-height: 3rem;
+        }
+    </style>
+    <script crossorigin="anonymous" integrity="sha512-h3aCJRk6tEHugDYUidF7GqixhzgeXSiSdq5U+5oLIJtIncSQq6eev48qqYfuTdrsH5Q1eO4IAmyJGDwzRaWNNQ==" src="./vue.common.dev.js"></script>
+    <script src="./index.js"></script>
+    <script>
+        var Main = {
+            data() {
+                return {
+                id: '',
+                name: '',
+                string: ''
+                }
+            }
+        }
+        var Ctor = Vue.extend(Main)
+        new Ctor().$mount('#app')
+    </script>
+</html>
