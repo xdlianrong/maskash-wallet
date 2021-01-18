@@ -3,36 +3,48 @@
     <head>
         <meta charset="utf-8">
         <title>wallet</title>
-        <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+        <link rel="stylesheet" href="./index.css">
     </head>
     <body>
-        <el-row id="app" style="padding-top: 40%;">
-            <el-col :span="8" :offset="8"><img src="./wallet-outline.svg"></el-col>
-            <div style="background: #f2f2f2;">
-                <el-col :span="10" :offset="7" class="button">
-                    <p style="margin: 0.5rem;">创建钱包</p>
+        <el-row id="app">
+            <!-- 图片也可以换成 element 自带的 -->
+            <el-row type="flex" justify="center"><el-col :xs="7" :sm="5" :md="3" :lg="2" :xl="2"><img src="./wallet-outline.svg"></el-col></el-row> 
+            <el-row type="flex" justify="center">
+                <el-col :xs="10" :sm="8" :md="5" :lg="4" :xl="4" class="button">
+                    <p style="margin: 0.8rem;">创建钱包</p>
                 </el-col>
-                <el-col :span="10" :offset="7" class="button">
-                    <p style="margin: 0.5rem;">加载钱包</p>
+            </el-row>
+            <el-row type="flex" justify="center">
+            <el-col :xs="10" :sm="8" :md="5" :lg="4" :xl="4" class="button">
+                    <p style="margin: 0.8rem;">加载钱包</p>
                 </el-col>
-            </div>
+            </el-row>
         </el-row>
     </body>
-    <script crossorigin="anonymous" integrity="sha512-h3aCJRk6tEHugDYUidF7GqixhzgeXSiSdq5U+5oLIJtIncSQq6eev48qqYfuTdrsH5Q1eO4IAmyJGDwzRaWNNQ==" src="https://lib.baomitu.com/vue/2.6.12/vue.common.dev.js"></script>
-    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script crossorigin="anonymous" integrity="sha512-h3aCJRk6tEHugDYUidF7GqixhzgeXSiSdq5U+5oLIJtIncSQq6eev48qqYfuTdrsH5Q1eO4IAmyJGDwzRaWNNQ==" src="./vue.common.dev.js"></script>
+    <script src="./index.js"></script>
     <script>new Vue().$mount('#app')</script>
     <style>
         .button {
-            font-size: 1.8rem;
-            margin-top: 0.3rem;
+            font-size: 1.5rem;
+            margin-top: -10px;
+            border: solid 10px #f2f2f2;
             text-align: center;
-            background: rgb(83, 138, 190);
+            background: #59aafa;
             border-radius: 4px;
+            color: white;
         }
 
-        .eliocn {
-            font-size: 8rem;        
+        html, body {
+            height: 100%;
+            margin: 0; 
+            padding: 0;
         }
         
+        #app {
+            position: relative;
+            top: 40%;
+            transform: translateY(-50%);
+        }
     </style>
 </html>
