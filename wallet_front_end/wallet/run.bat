@@ -1,2 +1,2 @@
-npm run serve
 code .
+npm run serve

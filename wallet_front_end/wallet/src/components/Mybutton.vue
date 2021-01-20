@@ -1,5 +1,7 @@
 <template>
-    <div class="button">{{ buttonMsg }}</div>
+    <div class="border">
+        <div class="button">{{ buttonMsg }}</div>
+    </div>
 </template>
 <style>
     .button {
@@ -7,9 +9,14 @@
         text-align: center;
         background: #59aafa;
         border-radius: 4px;
-        border: #f2f2f2 10px solid;
         color: white;
         line-height: 3.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+    }
+
+    .border {
+        border-radius: 4px;
+        border: #f2f2f2 10px solid;
     }
 </style>
 <script>

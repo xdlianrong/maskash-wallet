@@ -29,7 +29,3 @@ const router = new VueRouter({
 
 export default router
 
-new Vue({
-    el: '#app',
-
-})
