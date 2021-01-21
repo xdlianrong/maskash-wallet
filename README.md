@@ -16,7 +16,7 @@
 
 ## 开发文档
 本项目的开发文档均在 ./doc 目录中，请根据每个人的开发进度编写文档。
-## 钱包初始化
+## 钱包初始化（监管者）
 
 初始化模块提供两个功能：新建钱包和加载钱包
 
@@ -56,3 +56,5 @@
 - [Geth-Comments](https://github.com/xdlianrong/Geth-Comments)
 - [RPC-API](https://github.com/xdlianrong/Geth-Comments/blob/master/dev/RPC%20API%E7%9A%84%E6%9B%B4%E6%94%B9%E6%97%A5%E5%BF%97%E5%92%8C%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.md)
 - [Regulator监管者](https://github.com/xdlianrong/Geth-Comments/tree/master/Regulator)
+- [Exchange交易所](https://github.com/xdlianrong/Geth-Comments/tree/master/exchange)
+
