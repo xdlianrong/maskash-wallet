@@ -33,7 +33,7 @@ func main() {
 	// 网页的静态文件
 	// 启动服务，平滑关闭
 	go func() {
-		if err := e.Start(":1998"); err != nil{
+		if err := e.Start(":4396"); err != nil{
 			e.Logger.Fatal("Fail to star with error:%v", err)
 		}
 	}()
