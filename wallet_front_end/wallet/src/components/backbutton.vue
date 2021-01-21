@@ -13,5 +13,6 @@ export default {
 <style>
     .backbutton {
         text-align: center;
+        color: grey;
     }
 </style>

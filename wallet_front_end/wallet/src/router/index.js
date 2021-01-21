@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Newwallet from '../views/Newwallet.vue'
 import Main from '../views/Main.vue'
 import Loadwallet from '../views/Loadwallet.vue'
+import Mainaction from '../views/Mainaction.vue'
 
 Vue.use(VueRouter)
 
@@ -24,6 +25,11 @@ const routes = [
     path: '/Loadwallet',
     name: 'Loadwallet',
     component: Loadwallet
+  },
+  {
+    path: '/Mainaction',
+    name: 'Mainaction',
+    component: Mainaction
   }
 ]
 
