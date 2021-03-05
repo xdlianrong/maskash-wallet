@@ -13,7 +13,6 @@ import (
 const (
 	ErrorValue   = "value cannot be empty"
 	RejectServer = "Server Error"
-
 )
 
 func Register(c echo.Context) error {
@@ -95,7 +94,7 @@ func Buycoin(c echo.Context) error {
 	}
 }
 
-func ExchangeCoin (c echo.Context) error {
+func ExchangeCoin(c echo.Context) error {
 	w := new(model.ExchangeCoin)
 	if err := c.Bind(w); err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
@@ -113,7 +112,7 @@ func decryptCoinReceipt(recript Receipt, priv ELGamal.PrivateKey) Coin {
 }
 
 //	解密随机数密文
-func decrypt(hex0xStringC1 string, hex0xStringC2 string, priv PrivateKey) string {
+func decrypt(hex0xStringC1 string, hex0xStringC2 string, priv ELGamal.PrivateKey) string {
 	hexData1, _ := hex.DecodeString(hex0xStringC1[2:])
 	hexData2, _ := hex.DecodeString(hex0xStringC2[2:])
 	C := ELGamal.CypherText{
@@ -123,4 +122,3 @@ func decrypt(hex0xStringC1 string, hex0xStringC2 string, priv PrivateKey) string
 	M := fmt.Sprintf("0x%x", ELGamal.Decrypt(priv, C))
 	return M
 }
-
