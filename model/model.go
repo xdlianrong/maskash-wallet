@@ -11,6 +11,7 @@ type NewWallet struct {
 }
 
 type BctoEx struct {
+	// 此处的 G1 是否多余
 	G1     string          `json:"g1"`
 	G2     string          `json:"g2"`
 	P      string          `json:"p"`

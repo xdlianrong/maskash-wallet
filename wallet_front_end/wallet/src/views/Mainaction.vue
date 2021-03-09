@@ -79,27 +79,30 @@ export default {
         }
     },
     methods: {
+        getPri() {
+            var pri = JSON.parse(window.localStorage.getItem(account)).bi;
+            console.log(pri);
+            return pri;
+        },
         transferm() {
             console.log("我要转账");
-            this.axios.post('http://localhost:1998/wallet/register', {
-                recPub: this.recPub,
-                transmoney: this.transmoney,
-                moneyProm: this.moneyProm
-                }).then((response)=>{
-                // 一堆赋值，我也忘了要存啥了
-                console.log(response);
-            })
+            // var pri = this.getPri();
+            // this.axios.post('http://localhost:1998/wallet/register', {
+            //         pri: pri,
+            //     }).then((response)=>{
+            //     // 一堆赋值，我也忘了要存啥了
+            //     console.log(response);
+            // })
         },
         buym() {
             console.log("我要购币");
-            this.axios.post('http://localhost:1998/wallet/register', {
-                recPub: this.recPub,
-                transmoney: this.transmoney,
-                moneyProm: this.moneyProm
-                }).then((response)=>{
-                // 一堆赋值，我也忘了要存啥了
-                console.log(response);
-            })
+             this.getPri();
+            // this.axios.post('http://localhost:1998/wallet/register', {
+            //         pri: pri,
+            //     }).then((response)=>{
+            //     // 一堆赋值，我也忘了要存啥了
+            //     console.log(response);
+            // })
         },
         recm() {
             console.log("我要收款");

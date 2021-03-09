@@ -65,7 +65,7 @@ export default {
                         this.$router.push({
                             name: 'Mainaction',
                             path: '/Mainaction',
-                            params: {
+                            query: {
                                 account: this.string,
                             }
                         })
