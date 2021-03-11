@@ -32,7 +32,26 @@
             </div>
 
             <div v-show="cmp == 4">
-                
+                <el-table  :data="his" style="width: 100%">
+                    <el-table-column
+                        prop="amount"
+                        label="金额"
+                        width="180">
+                    </el-table-column>
+                    <el-table-column
+                        prop="cmv"
+                        label="姓名"
+                        width="180">
+                    </el-table-column>
+                    <el-table-column
+                        prop="r"
+                        label="地址">
+                    </el-table-column>
+                    <el-table-column
+                        prop="spent"
+                        label="使用">
+                    </el-table-column>
+                </el-table>
             </div>
 
             <div v-show="cmp == 5">
@@ -47,6 +66,7 @@
 import navmenu from '../components/Navmenu'
 import mybutton from '../components/Mybutton'
 var account;
+var his = new Array();
 export default {
     components: {
         navmenu,
@@ -68,7 +88,8 @@ export default {
             G2: '',
             P: '',
             H: '',
-            hash: ''
+            hash: '',
+            his: his
         }
     },
     created: function () {
@@ -91,11 +112,13 @@ export default {
             var pri = JSON.parse(window.localStorage.getItem(account)).bi;
             return pri;
         },
-        storeImfo(response) {
+        storeImfo(response, amount) {
             // 更新信息
             // 取出 history 并修改
             var old = JSON.parse(window.localStorage.getItem(account));
-            old.history.push(response.data); // 喜加一
+            var neww = response.data;
+            neww.vm = amount;
+            old.history.push(neww); // 喜加一
             window.localStorage.account = JSON.stringify(old);
             console.log(window.localStorage.account);
         },
@@ -110,12 +133,12 @@ export default {
             var pri = this.getPri();
             this.axios.post('http://localhost:4396/wallet/buyCoin', {
                 priA: pri,
-                account: this.transmoney,
-                    pubB: new this.Pub(this.G1, this.G2, this.P, this.H),
+                amount: this.transmoney,
+                pubB: new this.Pub(this.G1, this.G2, this.P, this.H),
                 cmv: this.moneyProm,
                 r: this.r
             }).then((response)=>{
-                this.storeImfo(response);
+                this.storeImfo(response, -this.transmoney);
             }).catch((response)=>{
                     this.$message.error(response);
                     console.log(response);
@@ -126,9 +149,9 @@ export default {
             var pri = this.getPri();
             this.axios.post('http://localhost:4396/wallet/buyCoin', {
                 pri: pri,
-                account: this.buym
+                amount: this.buym
             }).then((response)=>{
-                this.storeImfo(response);
+                this.storeImfo(response, this.buym);
             }).catch((response)=>{
                     this.$message.error(response);
                     console.log(response);
@@ -142,7 +165,7 @@ export default {
                 pri: pri,
                 hash: this.hash
             }).then((response)=>{
-                this.storeImfo(response);
+                this.storeImfo(response, response.data.amount);
             }).catch((response)=>{
                     this.$message.error(response);
                     console.log(response);
@@ -157,6 +180,10 @@ export default {
             } else {
                 document.getElementById("o").style.top = "45%";
                 document.getElementById("o").style.transform = "translateY(-50%)";
+            }
+            // 加载历史
+            if (this.cmp == 4) {
+                his = JSON.parse(window.localStorage.getItem(account)).history;
             }
         },
         signoutf() {
