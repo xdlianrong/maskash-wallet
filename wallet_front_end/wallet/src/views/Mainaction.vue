@@ -2,7 +2,7 @@
     <div style="height: 100%;">
         <navmenu @changecmp="changecmps" ref="nav"></navmenu>  
         <el-row type="flex" justify="center" id="o">
-            <el-col :xs="20" :sm="15" :md="12" :lg="8" :xl="7">  
+            <el-col :xs="20" :sm="15" :md="12" :lg="8" :xl="7" v-show="cmp != 4">  
             <div v-show="cmp == 1">
                 <p>购买金额:</p>
                 <el-input maxlength="10" v-model="money" ></el-input>
@@ -14,7 +14,7 @@
                 <el-input v-model="G1" placeholder="G1"></el-input>
                 <el-input v-model="G2" placeholder="G2" style="margin-top:10px;"></el-input>
                 <el-input v-model="P" placeholder="P" style="margin-top:10px;"></el-input>
-                <el-input v-model="H" placeholder="H" style="margin-top:10px;"></el-input>
+                <el-input v-model="pub" placeholder="pub" style="margin-top:10px;"></el-input>
                 <p>转账金额:</p>
                 <el-input maxlength="10" v-model="transmoney" ></el-input>
                 <p>代币承诺</p>
@@ -30,43 +30,39 @@
                 <el-input v-model="hash" ></el-input>
                 <mybutton :buttonMsg="recv" @click.native="recm"></mybutton>
             </div>
-
-            <div v-show="cmp == 4">
-                <el-table  :data="his" style="width: 100%">
-                    <el-table-column
-                        prop="amount"
-                        label="金额"
-                        width="180">
-                    </el-table-column>
-                    <el-table-column
-                        prop="cmv"
-                        label="姓名"
-                        width="180">
-                    </el-table-column>
-                    <el-table-column
-                        prop="r"
-                        label="地址">
-                    </el-table-column>
-                    <el-table-column
-                        prop="spent"
-                        label="使用">
-                    </el-table-column>
-                </el-table>
-            </div>
-
+            
             <div v-show="cmp == 5">
                 <mybutton :buttonMsg="showImfo" @click.native="showImfof"></mybutton>
                 <mybutton :buttonMsg="signout" @click.native="signoutf"></mybutton>
             </div>
             </el-col>
         </el-row>
+        <div v-show="cmp == 4" id="histb">
+                <el-table  :data="hisList" >
+                    <el-table-column
+                        prop="amount"
+                        label="金额">
+                    </el-table-column>
+                    <el-table-column
+                        prop="hash"
+                        label="哈希">
+                    </el-table-column>
+                    <el-table-column
+                        prop="cmv"
+                        label="找零承诺cmv">
+                    </el-table-column>
+                    <el-table-column
+                        prop="r"
+                        label="随机数r">
+                    </el-table-column>
+                </el-table>
+        </div>
     </div>
 </template>
 <script>
 import navmenu from '../components/Navmenu'
 import mybutton from '../components/Mybutton'
 var account;
-var his = new Array();
 export default {
     components: {
         navmenu,
@@ -87,9 +83,9 @@ export default {
             G1: '',
             G2: '',
             P: '',
-            H: '',
+            pub: '',
             hash: '',
-            his: his
+            hisList: ''
         }
     },
     created: function () {
@@ -106,6 +102,7 @@ export default {
                 })
             }, 1500);   
         }
+        this.hisList = JSON.parse(window.localStorage.getItem(account)).history;
     },
     methods: {
         getPri() {
@@ -183,7 +180,8 @@ export default {
             }
             // 加载历史
             if (this.cmp == 4) {
-                his = JSON.parse(window.localStorage.getItem(account)).history;
+                // 更新
+                this.hisList = JSON.parse(window.localStorage.getItem(account)).history;               
             }
         },
         signoutf() {
@@ -193,13 +191,44 @@ export default {
             })
         },
         showImfof() {
-            var imfo = (JSON.parse(window.localStorage.getItem(account))).bi;
-            this.$alert(JSON.stringify(imfo), {
-                confirmButtonText: '确定',});
+            var G1 = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.G1);
+            var G2 = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.G2);
+            var P = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.P);
+            var pub = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.publickey);
+            var pri = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.privatekey);
+            console.log(G1);
+            this.$alert("<p>G1:" + G1 + "</p>" +
+                "<p>G2:" + G2 + "</p>" +
+                "<p>P:" + P + "</p>" +
+                "<p>pub:" + pub + "</p>" +
+                "<p>pri:" + pri + "</p>", {
+                confirmButtonText: '确定',
+                dangerouslyUseHTMLString: true,
+                customClass:'message_box_alert'
+            });
+            // var twqee = {
+            //     hash: "ASBWJAKFA",
+            //     cmv: "SDUIFUISAASK",
+            //     r: "DSFSAFSA",
+            //     amount: 100,
+            //     vm: 100
+            // };
+            // var old = JSON.parse(window.localStorage.getItem(account));            old.history.push(twqee); // 喜加一
+            // window.localStorage.setItem(account, JSON.stringify(old));
+            // console.log(old);
         }
     }
 }
 </script>
 <style>
-
+#histb {
+    width: 98%;
+    margin-left: 1%;
+}
+.message_box_alert {
+    word-break: break-all !important;
+}
+.el-message-box{
+    width: 80%;
+}
 </style>
