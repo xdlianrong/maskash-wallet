@@ -15,13 +15,19 @@
                 <el-input v-model="G2" placeholder="G2" style="margin-top:10px;"></el-input>
                 <el-input v-model="P" placeholder="P" style="margin-top:10px;"></el-input>
                 <el-input v-model="pub" placeholder="pub" style="margin-top:10px;"></el-input>
+                <div style="margin-top:10px;">
+                    <a>或选择本地钱包&emsp;</a>
+                    <el-select v-model="baccount" placeholder="请选择" clearable>
+                        <el-option v-for="it in accountList" :value="it" :key="it.key" :label="it"></el-option>
+                    </el-select>
+                </div>
                 <p>转账金额:</p>
                 <el-input maxlength="10" v-model="spend" ></el-input>
-                <p>承诺金额</p>
+                <p>使用承诺的金额</p>
                 <el-input maxlength="10" v-model="transmoney" ></el-input>
-                <p>代币承诺</p>
+                <p>承诺cmv</p>
                 <el-input v-model="moneyProm" ></el-input>
-                <p>随机数</p>
+                <p>随机数vor</p>
                 <el-input v-model="r" ></el-input>
                 <!-- 上面这些够了，可以返回东西了 -->
                 <mybutton :buttonMsg="transfer" @click.native="transferm"></mybutton>
@@ -47,15 +53,15 @@
                     </el-table-column>
                     <el-table-column
                         prop="hash"
-                        label="哈希">
+                        label="哈希hash">
                     </el-table-column>
                     <el-table-column
                         prop="cmv"
-                        label="找零承诺cmv">
+                        label="承诺cmv">
                     </el-table-column>
                     <el-table-column
                         prop="vor"
-                        label="随机数r">
+                        label="随机数vor">
                     </el-table-column>
                 </el-table>
         </div>
@@ -65,6 +71,7 @@
 import navmenu from '../components/Navmenu'
 import mybutton from '../components/Mybutton'
 var account;
+var accountList = new Array();
 export default {
     components: {
         navmenu,
@@ -89,7 +96,9 @@ export default {
             hash: '',
             hisList: '',
             spend: '',
-            nowm: '1'
+            nowm: '',
+            accountList,
+            baccount: ''
         }
     },
     created: function () {
@@ -110,6 +119,30 @@ export default {
     },
     mounted: function () {
         this.showCoin();
+        // 获取本地账户列表
+        for(var i = 0; i < window.localStorage.length; i++) {
+            var name = window.localStorage.key(i);
+            if (name != 'loglevel:webpack-dev-server' && name != account) {
+                accountList.push(name);
+            }
+        }     
+    },
+    watch: {
+        baccount(val) {
+            if(val == '') {
+                this.G1 = '';
+                this.G2 = '';
+                this.P = '';
+                this.pub = '';
+            } else {
+                var b = JSON.parse(window.localStorage.getItem(val)).imfo;
+                console.log(b);
+                this.G1 = b.G1;
+                this.G2 = b.G2;
+                this.P = b.P;
+                this.pub = b.publickey;
+            }
+        }
     },
     methods: {
         getPri() {
@@ -234,6 +267,7 @@ export default {
         },
         signoutf() {
             account = undefined;
+            accountList.length = 0;
             this.$router.push({
                 path: '/'
             })
@@ -254,6 +288,8 @@ export default {
                 dangerouslyUseHTMLString: true,
                 customClass:'message_box_alert'
             });
+                        window.localStorage.setItem(2,window.localStorage.getItem("1"));
+
             // var twqee = {
             //     hash: "ASBWJAKFA",
             //     cmv: "SDUIFUISAASK",
@@ -270,7 +306,6 @@ export default {
             console.log("改余额");
             var sum = 0;
             var his = JSON.parse(window.localStorage.getItem(account)).history;
-            console.log(his);
             for (var i = 0; i < his.length; i++){
                 if(his[i].vm != undefined){
                     sum = sum + parseInt(his[i].vm);
