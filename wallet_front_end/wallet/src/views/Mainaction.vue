@@ -1,6 +1,6 @@
 <template>
     <div style="height: 100%;">
-        <navmenu @changecmp="changecmps" ref="nav"></navmenu>  
+        <navmenu @changecmp="changecmps"  ref="n"></navmenu>  
         <el-row type="flex" justify="center" id="o">
             <el-col :xs="20" :sm="15" :md="12" :lg="8" :xl="7" v-show="cmp != 4">  
             <div v-show="cmp == 1">
@@ -20,9 +20,9 @@
                 <p>承诺金额</p>
                 <el-input maxlength="10" v-model="transmoney" ></el-input>
                 <p>代币承诺</p>
-                <el-input maxlength="10" v-model="moneyProm" ></el-input>
+                <el-input v-model="moneyProm" ></el-input>
                 <p>随机数</p>
-                <el-input maxlength="10" v-model="r" ></el-input>
+                <el-input v-model="r" ></el-input>
                 <!-- 上面这些够了，可以返回东西了 -->
                 <mybutton :buttonMsg="transfer" @click.native="transferm"></mybutton>
             </div>
@@ -54,7 +54,7 @@
                         label="找零承诺cmv">
                     </el-table-column>
                     <el-table-column
-                        prop="r"
+                        prop="vor"
                         label="随机数r">
                     </el-table-column>
                 </el-table>
@@ -68,7 +68,7 @@ var account;
 export default {
     components: {
         navmenu,
-        mybutton
+        mybutton,
     },
     data() {
         return {
@@ -88,7 +88,8 @@ export default {
             pub: '',
             hash: '',
             hisList: '',
-            spend: ''
+            spend: '',
+            nowm: '1'
         }
     },
     created: function () {
@@ -107,21 +108,26 @@ export default {
         }
         this.hisList = JSON.parse(window.localStorage.getItem(account)).history;
     },
+    mounted: function () {
+        this.showCoin();
+    },
     methods: {
         getPri() {
-            this.$message('服务器正在挖矿，请耐心等待10min');
             var pri = JSON.parse(window.localStorage.getItem(account)).imfo;
             return pri;
         },
         storeImfo(response, amount) {
             // 更新信息
             // 取出 history 并修改
+            console.log("?");
             var old = JSON.parse(window.localStorage.getItem(account));
             var neww = response.data;
             neww.vm = amount;
             old.history.push(neww); // 喜加一
-            window.localStorage.account = JSON.stringify(old);
-            console.log(window.localStorage.account);
+            console.log(neww);
+            window.localStorage.setItem(account, JSON.stringify(old));
+            console.log(window.localStorage.getItem(account));
+            this.showCoin();
         },
         Pub(G1, G2, P, H) {
             this.G1 = G1;
@@ -132,35 +138,33 @@ export default {
         transferm() {
             console.log("我要转账");
             var pri = this.getPri();
-            this.axios({
-                method: 'post',
-                url: 'http://39.105.58.136:4396/wallet/exchange',
-                data: {
+            this.$message('正在生成：会计平衡证明、监管相等证明、范围证明、密文格式正确证明');
+            this.axios.post('http://39.105.58.136:4396/wallet/exchange',{
                     sg1: pri.G1,
                     sg2: pri.G2,
                     sp: pri.P,
-                    sh: pri.pub,
-                    sx:pri.pri,
+                    sh: pri.publickey,
+                    sx:pri.privatekey,
                     amount: this.transmoney,
-                    g1: this.G1,
-                    g2: this.G2,
-                    p: this.P,
-                    h: this.pub,
+                    rg1: this.G1,
+                    rg2: this.G2,
+                    rp: this.P,
+                    rh: this.pub,
                     cmv: this.moneyProm,
                     vor: this.r,
                     spend: this.spend
-                },
-                timeout: '600000'
             }).then((response)=>{
                 this.storeImfo(response, -this.spend);
             }).catch((response)=>{
                     this.$message.error(response);
                     console.log(response);
             });
+            
         },
         buym() {
             console.log("我要购币");
             var pri = this.getPri();
+            console.log(pri.privatekey);
             this.axios({
                 url: 'http://39.105.58.136:4396/wallet/buycoin',
                 method: 'post',
@@ -168,18 +172,27 @@ export default {
                     g1: pri.G1,
                     g2: pri.G2,
                     p: pri.P,
-                    h: pri.pub,
-                    x:pri.pri,
-                    amount: this.buym
-                },
+                    h: pri.publickey,
+                    x: pri.privatekey,
+                    amount: this.money
+                    },
                 timeout: '600000'
             }).then((response)=>{
-                this.storeImfo(response, this.buym);
+                this.storeImfo(response, this.money);
             }).catch((response)=>{
                     this.$message.error(response);
                     console.log(response);
             });
-        
+            this.$message.success({
+                        message: '金额加密正确',
+                        duration: 1000
+                    });
+            setTimeout(() => {
+                this.$message.success({
+                        message: '公钥加密正确',
+                        duration: 1000
+                    }); 
+            }, 2000);
         },
         recm() {
             console.log("我要收款");
@@ -191,8 +204,8 @@ export default {
                     g1: pri.G1,
                     g2: pri.G2,
                     p: pri.P,
-                    h: pri.pub,
-                    x:pri.pri,
+                    h: pri.publickey,
+                    x:pri.privatekey,
                     hash: this.hash
                 } ,
                 timeout: '600000'
@@ -226,12 +239,12 @@ export default {
             })
         },
         showImfof() {
+            this.showCoin();
             var G1 = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.G1);
             var G2 = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.G2);
             var P = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.P);
             var pub = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.publickey);
             var pri = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.privatekey);
-            console.log(G1);
             this.$alert("<p>G1:" + G1 + "</p>" +
                 "<p>G2:" + G2 + "</p>" +
                 "<p>P:" + P + "</p>" +
@@ -251,6 +264,21 @@ export default {
             // var old = JSON.parse(window.localStorage.getItem(account));            old.history.push(twqee); // 喜加一
             // window.localStorage.setItem(account, JSON.stringify(old));
             // console.log(old);
+        },
+        showCoin(){
+            // 刷新余额
+            console.log("改余额");
+            var sum = 0;
+            var his = JSON.parse(window.localStorage.getItem(account)).history;
+            console.log(his);
+            for (var i = 0; i < his.length; i++){
+                if(his[i].vm != undefined){
+                    sum = sum + parseInt(his[i].vm);
+                    console.log(sum);
+                }
+            }
+            // 上当了,因为少了个s找了好久问题
+            this.$refs.n.changenm(sum);    
         }
     }
 }

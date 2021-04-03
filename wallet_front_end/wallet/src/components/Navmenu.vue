@@ -1,9 +1,11 @@
 <template>
 <!-- 其实可以用 Tab 实现 -->
     <div>
+        <img src="../assets/m.png" class="s">
         <el-card>
+            
             <span style="font-size: 0.8rem;">余额</span>
-            <span style="font-size: 1.5rem; ">&emsp;0</span>
+            <span style="font-size: 1.5rem; ">&emsp;{{nowm}}</span>
         </el-card>
         <el-menu mode="horizontal" class="emenu" background-color="rgb(5, 126, 214)" active-text-color="white" text-color="rgb(89, 162, 214)">
             <el-menu-item index="1" @click="con(1)" ref="no">购币</el-menu-item>
@@ -16,11 +18,20 @@
 </template>
 <script>
 export default {
+
+    data() {
+        return {
+            nowm: 0
+        }
+    },
     methods: {
         con(index) {
             console.log(index);
             // 修改父组件的值
             this.$emit('changecmp', index);    
+        },
+        changenm(vm) {
+            this.nowm = vm;
         }
     },
     mounted: function () {
@@ -55,5 +66,12 @@ export default {
     }
     .el-card, .el-message {
         border-radius: 0 !important;
+    }
+    .s {
+        position: absolute;
+        height: 4.5rem;
+    }
+    .el-card__body {
+        padding: 1.5rem !important;
     }
 </style>
