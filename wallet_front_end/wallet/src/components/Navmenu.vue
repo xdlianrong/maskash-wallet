@@ -4,7 +4,7 @@
         <img src="../assets/m.png" class="s">
         <el-card>
             <strong style="position: absolute; right: 10px;font-size: 1.3rem">{{name}}</strong>            
-            <span style="font-size: 0.8rem;">余额</span>
+            <span style="font-size: 0.8rem;">积分余额</span>
             <span style="font-size: 1.5rem; ">&emsp;{{nowm}}</span>
         </el-card>
         <el-menu mode="horizontal" class="emenu" background-color="rgb(5, 126, 214)" active-text-color="white" text-color="rgb(89, 162, 214)">
