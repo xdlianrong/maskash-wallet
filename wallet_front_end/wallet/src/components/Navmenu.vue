@@ -7,7 +7,7 @@
             <span style="font-size: 0.8rem;">积分余额</span>
             <span style="font-size: 1.5rem; ">&emsp;{{nowm}}</span>
         </el-card>
-        <el-menu mode="horizontal" class="emenu" background-color="rgb(5, 126, 214)" active-text-color="white" text-color="rgb(89, 162, 214)">
+        <el-menu mode="horizontal" class="emenu" background-color="white" active-text-color="#007FD8" text-color="#007FD8">
             <el-menu-item index="1" @click="con(1)" ref="no">
                     <i class="el-icon-coin"></i>兑换
                 </el-menu-item>
@@ -48,10 +48,7 @@ export default {
 </script>
 <style>
 /* 开发者模式拿到的 css 类名 */
-    .el-menu-item:hover, .el-menu-item:focus {
-        background-color: rgb(2, 100, 170) !important;
-        text-align: center;
-    }
+    
     .el-menu--horizontal>.el-menu-item {
         width: 20%;
         text-align: center;
@@ -60,15 +57,16 @@ export default {
         display: flex;
     }
     .el-menu-item.is-active {
-        background-color: rgb(2, 100, 170) !important;
+        background-color: white !important;
     }
     .el-card {
         border: none !important;
-        background-color:#1656b9 !important;
+        background-color:#007FD8 !important;
         color: white !important;
         text-align: center;
         /* display: flex;
         justify-content: center; */
+        border-bottom-left-radius: ;
     }
     .el-card, .el-message {
         border-radius: 0 !important;
