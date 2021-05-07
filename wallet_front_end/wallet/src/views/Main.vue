@@ -2,7 +2,7 @@
   <div id="o">
     <el-row>
             <!-- 图片也可以换成 element 自带的 -->
-            <el-row type="flex" justify="center"><img src="../assets/w.png" style="width: 10rem"></el-row> 
+            <el-row type="flex" justify="center"><img src="../assets/w.png" style="width: 10rem; height: 10rem"></el-row> 
             <el-row type="flex" justify="center" style="margin-top: 0.5rem;">
                 <el-col :xs="10" :sm="8" :md="7.5" :lg="7.5" :xl="7.5">
                     <router-link to="/Newwallet" style="text-decoration: none;">
