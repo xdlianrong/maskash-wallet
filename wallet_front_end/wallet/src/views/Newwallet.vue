@@ -51,10 +51,10 @@ export default {
   methods: {
     Account(imfo) {
       this.imfo = imfo;
-      this.history = new Array();
+      this.history = [];
     },
     register() {
-      if (this.id == '' || this.name == '' || this.string == '') {
+      if (this.id === '' || this.name === '' || this.string === '') {
         this.$message.error('提交的信息不能为空');
       } else {
         this.axios.post('http://127.0.0.1:4396/wallet/register', {
