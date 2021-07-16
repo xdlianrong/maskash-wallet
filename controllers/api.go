@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
@@ -30,7 +31,11 @@ func Register(c echo.Context) error {
 	}
 	// 计算公私钥
 	account := ecc.GenerateAccount(w.Str, w.Name, w.Id, w.Str)
-	if res := register(account); res == "Successful!" {
+	res, err := register(account)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, RejectServer)
+	}
+	if res == "Successful!" {
 		return c.JSON(http.StatusOK, account.KeyToString())
 	} else {
 		return c.JSON(http.StatusInternalServerError, RejectServer)
@@ -63,9 +68,12 @@ func Register(c echo.Context) error {
 	//}
 }
 
-func register(account ecc.Account) string {
+func register(account ecc.Account) (string, error) {
 	data := account.Info
-	body := ethRPCPost(data, RegulatorURL+"register")
+	body, err := ethRPCPost(data, RegulatorURL+"register")
+	if err != nil {
+		return "", err
+	}
 	res := string(body)
 	if res == "Successful!" {
 		fmt.Println("账户" + account.Info.Name + "注册成功")
@@ -74,7 +82,7 @@ func register(account ecc.Account) string {
 	} else if res == "Fail!" {
 		Fatalf("账户" + account.Info.Name + "注册失败")
 	}
-	return string(body)
+	return string(body), nil
 }
 
 // 39.105.58.136
@@ -84,7 +92,10 @@ func Buycoin(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 	// 向交易所发出购币请求
-	body := ethRPCPost(w, ExchangeURL + "buy")
+	body, err := ethRPCPost(w, ExchangeURL+"buy")
+	if err != nil {
+		return err
+	}
 	var receipt utils.Receipt
 	json.Unmarshal(body, &receipt)
 
@@ -113,11 +124,25 @@ func ExchangeCoin(c echo.Context) error {
 	}
 	amount, _ := strconv.Atoi(coin.Amount)
 	spend, _ := strconv.Atoi(w.Spend)
-	senderGethAccount := utils.EthAccounts(8545)[0]
-	receiverGethAccount := utils.EthAccounts(8545)[0]
-	txHash := utils.EthSendTransaction(8545, senderGethAccount, receiverGethAccount, senderPriv, reciverPub, coin, amount, spend)
+	if spend > amount {
+		return c.JSON(http.StatusOK, errors.New("转出金额不可大于承诺额"))
+	}
+	senderEthAccount, err := utils.EthAccounts(8545)
+	if err != nil {
+		return c.JSON(http.StatusOK, err.Error())
+	}
+	senderGethAccount := senderEthAccount[0]
+	receiverEthAccount, err := utils.EthAccounts(8545)
+	if err != nil {
+		return c.JSON(http.StatusOK, err.Error())
+	}
+	receiverGethAccount := receiverEthAccount[0]
+	txHash, err := utils.EthSendTransaction(8545, senderGethAccount, receiverGethAccount, senderPriv, reciverPub, coin, amount, spend)
+	if err != nil {
+		return c.JSON(http.StatusOK, err.Error())
+	}
 	utils.MineTx(8545, txHash)
-	rpcTx := utils.EthGetTransactionByHash(8545, txHash)
+	rpcTx, err := utils.EthGetTransactionByHash(8545, txHash)
 	tx := rpcTx.Result
 	returnCoin := utils.Coin{
 		Cmv:    tx.CmR,
@@ -132,8 +157,14 @@ func Receive(c echo.Context) error {
 	if err := c.Bind(w); err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
+	if len(w.Hash) != 66 {
+		return c.JSON(http.StatusOK, errors.New("未找到此交易"))
+	}
 	privKey := utils.CreatePriKey(w.G1, w.G2, w.P, w.H, w.X)
-	rpcTx := utils.EthGetTransactionByHash(8545, w.Hash)
+	rpcTx, err := utils.EthGetTransactionByHash(8545, w.Hash)
+	if err != nil {
+		return c.JSON(http.StatusOK, err.Error())
+	}
 	tx := rpcTx.Result
 	returnCoin := utils.Coin{
 		Cmv:    tx.CmO,
@@ -160,7 +191,7 @@ func decrypt(hex0xStringC1 string, hex0xStringC2 string, priv ecc.PrivateKey) st
 		C1: hexData1,
 		C2: hexData2,
 	}
-	M := fmt.Sprintf("0x%x", ecc.Decrypt(priv, C))
+	M := fmt.Sprintf("0x%x", ecc.ECCDecrypt(priv, C))
 	return M
 }
 

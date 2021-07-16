@@ -4,6 +4,8 @@ import (
 	"crypto/elliptic"
 	"encoding/binary"
 	"fmt"
+	ecies "github.com/ecies/go"
+	"github.com/fomichev/secp256k1"
 	"math/big"
 )
 
@@ -76,9 +78,32 @@ func Decrypt(priv PrivateKey, C CypherText) (M []byte) {
 	pr := PrivKey{p1, priv.X}
 	x1, y1 := elliptic.Unmarshal(EC.C, C.C1)
 	x2, y2 := elliptic.Unmarshal(EC.C, C.C2)
-	return pr.Decrypt(Enc{ECPoint{x1,y1},ECPoint{x2, y2}})
+	return pr.Decrypt(Enc{ECPoint{x1, y1}, ECPoint{x2, y2}})
 }
 
+// ecc(ecies)加密
+func ECCEncrypt(pub PublicKey, M []byte) (C CypherText) {
+	p1 := ConvertPub(pub)
+	puu := ecies.PublicKey{X: p1.H.X, Y: p1.H.Y, Curve: secp256k1.SECP256K1()}
+	ciphertext, err := ecies.Encrypt(&puu, M)
+	if err != nil {
+		panic(err)
+	}
+	return CypherText{ciphertext, nil}
+}
+
+// ecc(ecies)解密
+func ECCDecrypt(priv PrivateKey, C CypherText) (M []byte) {
+	p1 := ConvertPub(priv.PublicKey)
+	puu := ecies.PublicKey{X: p1.H.X, Y: p1.H.Y, Curve: secp256k1.SECP256K1()}
+	prv := ecies.PrivateKey{D: priv.X, PublicKey: &puu}
+
+	plaintext, err := ecies.Decrypt(&prv, C.C1)
+	if err != nil {
+		panic(err)
+	}
+	return plaintext
+}
 func GenerateKeys(info string) (pub PublicKey, priv PrivateKey, err error) {
 	prv := GenKeys(info)
 	pubb := RecoverPub(prv.PubKey)
@@ -86,11 +111,11 @@ func GenerateKeys(info string) (pub PublicKey, priv PrivateKey, err error) {
 	return pubb, prvv, nil
 }
 
-func (pub PublicKey) Commit(v *big.Int, rnd []byte) Commitment{
+func (pub PublicKey) Commit(v *big.Int, rnd []byte) Commitment {
 	pub1 := ConvertPub(pub)
 	com := pub1.G1.Mult(v).Add(pub1.H.Mult(new(big.Int).SetBytes(rnd)))
 	com1 := elliptic.Marshal(EC.C, com.X, com.Y)
-	return Commitment{com1,rnd}
+	return Commitment{com1, rnd}
 }
 
 func (pub PublicKey) CommitByBytes(b []byte, rnd []byte) Commitment {
@@ -98,35 +123,33 @@ func (pub PublicKey) CommitByBytes(b []byte, rnd []byte) Commitment {
 	v := new(big.Int).SetBytes(b)
 	com := pub1.G1.Mult(v).Add(pub1.H.Mult(new(big.Int).SetBytes(rnd)))
 	com1 := elliptic.Marshal(EC.C, com.X, com.Y)
-	return Commitment{com1,rnd}
+	return Commitment{com1, rnd}
 }
 
-func (pub PublicKey) CommitByUint64(v uint64, rnd []byte) Commitment{
+func (pub PublicKey) CommitByUint64(v uint64, rnd []byte) Commitment {
 	v_ := new(big.Int).SetUint64(v)
 	return pub.Commit(v_, rnd)
 }
 
-func (pub PublicKey) VerifyCommitment(commit Commitment) uint64{
-	x,y := elliptic.Unmarshal(EC.C, commit.Commitment)
-	com := ECPoint{x,y}
+func (pub PublicKey) VerifyCommitment(commit Commitment) uint64 {
+	x, y := elliptic.Unmarshal(EC.C, commit.Commitment)
+	com := ECPoint{x, y}
 	pub1 := ConvertPub(pub)
 	v := big.NewInt(0)
 	for {
-		if pub1.G1.Mult(v).Add(pub1.H.Mult(new(big.Int).SetBytes(commit.R))).Equal(com){
+		if pub1.G1.Mult(v).Add(pub1.H.Mult(new(big.Int).SetBytes(commit.R))).Equal(com) {
 			return 1
 		}
-		v = new(big.Int).Add(v,big.NewInt(1))
-		if v == big.NewInt(50000){
+		v = new(big.Int).Add(v, big.NewInt(1))
+		if v == big.NewInt(50000) {
 			break
 		}
 	}
 	return 0
 }
 
-
-
 func Sign(priv PrivateKey, m []byte) (sig Signature) {
-	prvv := PrivKey{ConvertPub(priv.PublicKey),priv.X}
+	prvv := PrivKey{ConvertPub(priv.PublicKey), priv.X}
 	sig = Signature{}
 	r, s, _, h := prvv.Sign(m)
 	sig.M = m
@@ -141,7 +164,7 @@ func Verify(pub PublicKey, sig Signature) bool {
 	return pubb.VerifySign(sig.M, sig.R, sig.S)
 }
 
-func EncryptValue(pub PublicKey, M uint64) (C CypherText, commit Commitment, err error){
+func EncryptValue(pub PublicKey, M uint64) (C CypherText, commit Commitment, err error) {
 	v := make([]byte, 8)
 	binary.BigEndian.PutUint64(v, M)
 	pubb := ConvertPub(pub)
@@ -149,19 +172,18 @@ func EncryptValue(pub PublicKey, M uint64) (C CypherText, commit Commitment, err
 	c1 := elliptic.Marshal(EC.C, cipher.P1.X, cipher.P1.Y)
 	c2 := elliptic.Marshal(EC.C, cipher.P2.X, cipher.P2.Y)
 	com1 := elliptic.Marshal(EC.C, comm.X, comm.Y)
-	return CypherText{c1,c2},Commitment{com1, r.Bytes()},nil
+	return CypherText{c1, c2}, Commitment{com1, r.Bytes()}, nil
 }
 
 func DecryptValue(priv PrivateKey, C CypherText) (v uint64) {
 	privkey := ConvertPriv(priv)
 	x1, y1 := elliptic.Unmarshal(EC.C, C.C1)
 	x2, y2 := elliptic.Unmarshal(EC.C, C.C2)
-	enc := Enc{ECPoint{x1,y1},ECPoint{x2,y2}}
+	enc := Enc{ECPoint{x1, y1}, ECPoint{x2, y2}}
 	return privkey.DecryptCM(enc)
 }
 
-
-func EncryptAddress(pub PublicKey, addr []byte) (C CypherText, commit Commitment, err error){
+func EncryptAddress(pub PublicKey, addr []byte) (C CypherText, commit Commitment, err error) {
 	addr_uint64 := binary.BigEndian.Uint64(addr)
 	return EncryptValue(pub, addr_uint64)
 }

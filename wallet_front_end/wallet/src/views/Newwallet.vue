@@ -2,18 +2,18 @@
     <div id="o" class="main">
         <!-- 输入信息，需要用 el-col 实现响应式布局 -->
         <div class="imfo">
-            <p style="margin-top: 0;">我们将通过您的个人信息为您生成账户公钥并在本地储存相关信息</p>
+            <p style="margin-top: 0;">我们将通过您的银行信息为您生成账户公钥并在本地储存相关信息</p>
             <p style="font-size: 17px; color: #666666;">为保证您的账户安全，并让您在多个设备上打开您的账户，请及时备份并安全保管相关文件</p>
 <!--                    <p>文件储存地址为.....</p>-->
 <!--                    <p>文件名为.....</p>-->
         </div>
         <el-row type="flex" justify="center">
             <el-col :xs="20" :sm="15" :md="8" :lg="8" :xl="8"  @click="register">                
-                <p><span class = "t"></span>姓名：</p>
+                <p><span class = "t"></span>银行名称：</p>
                 <el-input maxlength="12" v-model="name" minlength="1"></el-input>
-                <p><span class = "t"></span>身份证号：</p>
+                <p><span class = "t"></span>账号：</p>
                 <el-input maxlength="18" minlength="18" v-model="id"></el-input>
-                <p><span class = "t"></span>自定义字符串：</p>
+                <p><span class = "t"></span>密码：</p>
                 <el-input maxlength="255" v-model="string" minlength="1"></el-input>
                 <mybutton :buttonMsg="bm" @click.native="register">创建账户</mybutton>
             </el-col>
@@ -57,7 +57,7 @@ export default {
             if (this.id == '' || this.name == '' || this.string == '') {
                 this.$message.error ('提交的信息不能为空');
             } else {
-                this.axios.post('http://39.105.58.136:4396/wallet/register', {
+                this.axios.post('http://127.0.0.1:4396/wallet/register', {
                     name: this.name,
                     id: this.id,
                     str: this.string
