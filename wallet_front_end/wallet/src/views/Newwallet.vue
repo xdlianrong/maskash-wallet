@@ -26,6 +26,7 @@
 // @ is an alias to /src
 import mybutton from '../components/Mybutton.vue'
 import backbutton from '../components/Backbutton.vue'
+import globle from '../globle'
 
 export default {
   components: {
@@ -57,7 +58,7 @@ export default {
       if (this.id === '' || this.name === '' || this.string === '') {
         this.$message.error('提交的信息不能为空');
       } else {
-        this.axios.post('http://127.0.0.1:4396/wallet/register', {
+        this.axios.post('http://' + globle.serverIp +'/wallet/register', {
           name: this.name,
           id: this.id,
           str: this.string

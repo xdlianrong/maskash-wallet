@@ -88,6 +88,7 @@
 <script>
 import navmenu from '../components/Navmenu'
 import mybutton from '../components/Mybutton'
+import globle from '../globle'
 
 let account;
 const accountList = [];
@@ -219,7 +220,7 @@ export default {
       }
       const pri = this.getPri();
       this.$message('正在生成：会计平衡证明、监管相等证明、范围证明、密文格式正确证明');
-      this.axios.post('http://127.0.0.1:4396/wallet/exchange', {
+      this.axios.post('http://' + globle.serverIp +'/wallet/exchange', {
         sg1: pri.G1,
         sg2: pri.G2,
         sp: pri.P,
@@ -254,7 +255,7 @@ export default {
       const pri = this.getPri();
       console.log(pri.privatekey);
       this.axios({
-        url: 'http://127.0.0.1:4396/wallet/buycoin',
+        url: 'http://' + globle.serverIp + '/wallet/buycoin',
         method: 'post',
         data: {
           g1: pri.G1,
@@ -297,7 +298,7 @@ export default {
       }
       const pri = this.getPri();
       this.axios({
-        url: 'http://127.0.0.1:4396/wallet/receive',
+        url: 'http://' + globle.serverIp + '/wallet/receive',
         method: 'post',
         data: {
           g1: pri.G1,
