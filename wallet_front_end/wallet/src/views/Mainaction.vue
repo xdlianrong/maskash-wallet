@@ -69,11 +69,19 @@
             </el-col>    
         </el-row>
 
-        <div id="progress">
-            <el-button  v-loading="loading">生成会计平衡证明</el-button>
-            <el-button  v-loading="loading">生成相等证明</el-button>
-            <el-button  v-loading="loading">正在公式</el-button>
-            <el-button  v-loading="loading"></el-button>
+        <div id="progress" v-show="cmp === 1">
+					<el-timeline>
+						<el-timeline-item
+						v-for="(activity, index) in activities"
+						:key="index"
+						:icon="activity.icon"
+						:type="activity.type"
+						:color="activity.color"
+						:size="activity.size"
+						:timestamp="activity.timestamp">
+						{{activity.content}}
+						</el-timeline-item>
+					</el-timeline>
         </div>
     </div>
 </template>
@@ -110,7 +118,22 @@ export default {
       nowm: '',
       accountList,
       baccount: '',
-      loading: true
+      loading: true,
+			activities: [{
+				content: '开始转出'
+			},{
+				content: '生成会计平衡证明'
+			},{
+				content: '生成相等证明'
+			},{
+				content: '生成范围证明'
+			},{
+				content: '生成格式正确证明'
+			},{
+				content: '挖矿共识'
+			},{
+				content: '转出成功'
+			}]
     }
   },
 //   created: function () {
@@ -247,16 +270,17 @@ export default {
         this.$message.error(response);
         console.log(response);
       });
-      this.$message.success({
-        message: '金额加密正确',
-        duration: 1000
-      });
-      setTimeout(() => {
-        this.$message.success({
-          message: '公钥加密正确',
-          duration: 1000
-        });
-      }, 2000);
+      this.progress();
+      // this.$message.success({
+      //   message: '金额加密正确',
+      //   duration: 1000
+      // });
+      // setTimeout(() => {
+      //   this.$message.success({
+      //     message: '公钥加密正确',
+      //     duration: 1000
+      //   });
+      // }, 2000);
     },
     recm() {
       console.log("我要收款");
@@ -359,6 +383,23 @@ export default {
       }
       // 上当了,因为少了个s找了好久问题
       this.$refs.n.changenm(sum);
+    },
+		// 改变展示状态
+		progress() {
+      var time = 0;
+			for (var i = 0; i < 7;i++) {
+        time = time + Math.random()*2000+1000;
+        this.pc(i, time);
+      }
+		},
+    pc(i, time) {
+      var state = document.getElementById("progress");
+      setTimeout(() => {
+        var ojArr = state.getElementsByTagName("li")[i].getElementsByTagName("div");
+        ojArr[0].style.borderLeft = "2px solid limegreen";
+        ojArr[1].style.backgroundColor = "limegreen";
+        console.log(ojArr[1]);
+        }, time);
     }
   }
 }
@@ -384,14 +425,19 @@ export default {
 
 #progress {
   display : flex;
-  margin-right: 60px;
+  margin-left: 70%;
   align-items: flex-end;
   flex-direction: column;
+  transform: translateY(-25%);
+	width: 20%;
 }
 
-#progress button {
-  background: grey;
-  width: 15rem;
+.el-timeline-item {
+	padding-bottom: 50px !important;
+}
+
+.el-timeline {
+	font-size: 16px !important;
 }
 </style>
 <style scoped>
