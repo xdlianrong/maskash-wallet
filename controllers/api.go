@@ -104,8 +104,13 @@ func Buycoin(c echo.Context) error {
 		// 购买成功,随机数解密
 		privKey := utils.CreatePriKey(w.G1, w.G2, w.P, w.H, w.X)
 		coin := decryptCoinReceipt(receipt, privKey, w.Amount)
-		utils.MineTx(8545, coin.Hash)
-		return c.JSON(http.StatusOK, coin)
+		utils.MineTx(model.EthPort, coin.Hash)
+		rpcTx, _ := utils.EthGetTransactionByHash(model.EthPort, receipt.Hash)
+		resBody := utils.CoinNTx{
+			Coin: coin,
+			TX:   rpcTx,
+		}
+		return c.JSON(http.StatusOK, resBody)
 	}
 }
 
@@ -126,30 +131,34 @@ func ExchangeCoin(c echo.Context) error {
 	if spend > amount {
 		return c.JSON(http.StatusOK, errors.New("转出金额不可大于承诺额"))
 	}
-	senderEthAccount, err := utils.EthAccounts(8545)
+	senderEthAccount, err := utils.EthAccounts(model.EthPort)
 	if err != nil {
 		return c.JSON(http.StatusOK, err.Error())
 	}
 	senderGethAccount := senderEthAccount[0]
-	receiverEthAccount, err := utils.EthAccounts(8545)
+	receiverEthAccount, err := utils.EthAccounts(model.EthPort)
 	if err != nil {
 		return c.JSON(http.StatusOK, err.Error())
 	}
 	receiverGethAccount := receiverEthAccount[0]
-	txHash, err := utils.EthSendTransaction(8545, senderGethAccount, receiverGethAccount, senderPriv, reciverPub, coin, amount, spend)
+	txHash, err := utils.EthSendTransaction(model.EthPort, senderGethAccount, receiverGethAccount, senderPriv, reciverPub, coin, amount, spend)
 	if err != nil {
 		return c.JSON(http.StatusOK, err.Error())
 	}
-	utils.MineTx(8545, txHash)
-	rpcTx, err := utils.EthGetTransactionByHash(8545, txHash)
+	utils.MineTx(model.EthPort, txHash)
+	rpcTx, err := utils.EthGetTransactionByHash(model.EthPort, txHash)
 	tx := rpcTx.Result
-	returnCoin := utils.Coin{
+	resCoin := utils.Coin{
 		Cmv:    tx.CmR,
 		Vor:    decrypt(tx.CmRRC1, tx.CmRRC2, senderPriv),
 		Hash:   txHash,
 		Amount: amount - spend,
 	}
-	return c.JSON(http.StatusOK, returnCoin)
+	resBody := utils.CoinNTx{
+		Coin: resCoin,
+		TX:   rpcTx,
+	}
+	return c.JSON(http.StatusOK, resBody)
 }
 func Receive(c echo.Context) error {
 	w := new(model.ReceiveData)
@@ -160,7 +169,7 @@ func Receive(c echo.Context) error {
 		return c.JSON(http.StatusOK, errors.New("未找到此交易"))
 	}
 	privKey := utils.CreatePriKey(w.G1, w.G2, w.P, w.H, w.X)
-	rpcTx, err := utils.EthGetTransactionByHash(8545, w.Hash)
+	rpcTx, err := utils.EthGetTransactionByHash(model.EthPort, w.Hash)
 	if err != nil {
 		return c.JSON(http.StatusOK, err.Error())
 	}

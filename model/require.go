@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 //url
 var (
-	Ethurl = "http://127.0.0.1:8545"
+	EthPort = 8545
+	Ethurl  = "http://127.0.0.1:" + strconv.Itoa(EthPort)
 
 	EthFrom = "0x41c060c18d1ba76971dc2d298d6e7cc64f7be57f"
 	EthTo   = "0x41c060c18d1ba76971dc2d298d6e7cc64f7be57f"

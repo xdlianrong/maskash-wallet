@@ -37,10 +37,10 @@ export default {
             // 修改父组件的值
             this.$emit('changecmp', index);    
         },
-        changenm(vm) {
+        changeSum(vm) {
             this.nowm = vm;
         },
-        changename(name) {
+        changeName(name) {
             this.name = name;
         }
     },

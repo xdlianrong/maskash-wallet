@@ -196,7 +196,10 @@ type RPCtx struct {
 		CmRRC2           string `json:"cmrrc2"`
 	} `json:"result"`
 }
-
+type CoinNTx struct {
+	Coin Coin  `json:"coin"`
+	TX   RPCtx `json:"tx"`
+}
 type SendRPCTx struct {
 	Jsonrpc string            `json:"jsonrpc"`
 	Method  string            `json:"method"`

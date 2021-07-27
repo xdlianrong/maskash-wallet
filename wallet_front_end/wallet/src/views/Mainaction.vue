@@ -18,19 +18,27 @@
           <div style="margin-top:10px;">
             <a>或选择本地账户&emsp;</a>
             <el-select v-model="baccount" placeholder="请选择" clearable>
-              <el-option v-for="it in accountList" :value="it" :key="it.key" :label="it"></el-option>
+              <el-option v-for="account in accountList" :value="account" :key="account.key"
+                         :label="account"></el-option>
+            </el-select>
+          </div>
+          <p><span class="t"></span>使用承诺的数额</p>
+          <el-input maxlength="10" v-model="transmoney" oninput="value=value.replace(/[^\d]/g,'')"></el-input>
+          <p><span class="t"></span>承诺cmv</p>
+          <el-input v-model="cmv"></el-input>
+          <p><span class="t"></span>随机数vor</p>
+          <el-input v-model="r"></el-input>
+          <div style="margin-top:10px;">
+            <a>或选择本地承诺&emsp;</a>
+            <el-select v-model="bindCM" placeholder="请选择" clearable>
+              <el-option v-for="cm in valuableCMList" :value="cm" :key="cm.key"
+                         :label="cm.cmv.slice(0,8)+'... 价值：'+cm.amount"></el-option>
             </el-select>
           </div>
           <p><span class="t"></span>转出数额:</p>
           <el-input maxlength="10" v-model="spend" oninput="value=value.replace(/[^\d]/g,'')"></el-input>
-          <p><span class="t"></span>使用承诺的数额</p>
-          <el-input maxlength="10" v-model="transmoney" oninput="value=value.replace(/[^\d]/g,'')"></el-input>
-          <p><span class="t"></span>承诺cmv</p>
-          <el-input v-model="moneyProm"></el-input>
-          <p><span class="t"></span>随机数vor</p>
-          <el-input v-model="r"></el-input>
           <!-- 上面这些够了，可以返回东西了 -->
-          <mybutton :buttonMsg="transfer" @click.native="transferm" style="margin-bottom: 20px"></mybutton>
+          <mybutton :buttonMsg="transfer" @click.native="transform" style="margin-bottom: 20px"></mybutton>
         </div>
 
         <div v-show="cmp === 3">
@@ -91,7 +99,9 @@ import mybutton from '../components/Mybutton'
 import globle from '../globle'
 
 let account;
-const accountList = [];
+const accountList = []
+// 本账户可用的承诺
+const valuableCMList = [];
 export default {
   components: {
     navmenu,
@@ -108,7 +118,8 @@ export default {
       money: '',
       cmp: '1', // 用来改变显示的组件
       transmoney: '',
-      moneyProm: '',
+      // 转账时要花掉的承诺
+      cmv: '',
       r: '',
       G1: '',
       G2: '',
@@ -119,7 +130,9 @@ export default {
       spend: '',
       nowm: '',
       accountList,
+      valuableCMList,
       baccount: '',
+      bindCM: '',
       loading: true,
       show: false,
       activities: [{
@@ -157,8 +170,6 @@ export default {
   },
   mounted: function () {
     this.showCoin();
-    if (this.showLog)
-      console.log("???");
     // 获取本地账户列表
     for (let i = 0; i < window.localStorage.length; i++) {
       const name = window.localStorage.key(i);
@@ -166,23 +177,37 @@ export default {
         accountList.push(name);
       }
     }
-    this.$refs.n.changename(account);
+    // 获取本账户所有可用承诺
+    for (let i = 0; i < this.hisList.length; i++) {
+      if (this.hisList[i].valuable)
+        valuableCMList.push(this.hisList[i]);
+    }
+    this.$refs.n.changeName(account);
   },
   watch: {
     baccount(val) {
-      if (val === '') {
+      if (!val) {
         this.G1 = '';
         this.G2 = '';
         this.P = '';
         this.pub = '';
       } else {
         const b = JSON.parse(window.localStorage.getItem(val)).info;
-        if (this.showLog)
-          console.log(b);
         this.G1 = b.G1;
         this.G2 = b.G2;
         this.P = b.P;
         this.pub = b.publickey;
+      }
+    },
+    bindCM(val) {
+      if (!val) {
+        this.transmoney = ''
+        this.cmv = ''
+        this.r = ''
+      } else {
+        this.transmoney = val.amount
+        this.cmv = val.cmv
+        this.r = val.vor
       }
     }
   },
@@ -193,18 +218,28 @@ export default {
     storeInfo(response, amount) {
       // 更新信息
       // 取出 history 并修改
-      if (this.showLog)
-        console.log("?");
-      var old = JSON.parse(window.localStorage.getItem(account));
-      var neww = response.data;
-      neww.vm = amount;
-      old.history.push(neww); // 喜加一
-      if (this.showLog)
-        console.log(neww);
+      const old = JSON.parse(window.localStorage.getItem(account));
+      const newRecord = response.data.coin;
+      newRecord.vm = amount;
+      old.history.push(newRecord); // 喜加一
       window.localStorage.setItem(account, JSON.stringify(old));
-      if (this.showLog)
-        console.log(window.localStorage.getItem(account));
       this.showCoin();
+    },
+    //废除承诺，将承诺值为cmv的承诺在localStorage中的valuable值改为false
+    abolitionCM(cmv) {
+      const findCmvIndex = function (cmv, history) {
+        for (let i = 0; i < history.length; i++) {
+          if (history[i].cmv === cmv) {
+            return i
+          }
+        }
+        return -1
+      }
+      const localStorage = JSON.parse(window.localStorage.getItem(account));
+      const index = findCmvIndex(cmv, localStorage.history)
+      if (index === -1 || !localStorage.history[index].valuable) return
+      localStorage.history[index].valuable = false
+      window.localStorage.setItem(account, JSON.stringify(localStorage));
     },
     Pub(G1, G2, P, H) {
       this.G1 = G1;
@@ -212,42 +247,41 @@ export default {
       this.P = P;
       this.H = H;
     },
-    transferm() {
+    transform() {
       if (this.showLog)
         console.log("我要转账");
       if (!this.G1 || !this.G2 || !this.P || !this.pub) {
-        this.$message('请完整输入接收方公钥账户');
+        this.$message.error('请完整输入接收方公钥账户');
         return
       }
-
       if (!this.transmoney) {
-        this.$message('请填写使用承诺的数额');
+        this.$message.error('请填写使用承诺的数额');
         return
       }
       const amount = parseInt(this.transmoney)
       if (amount === 0) {
-        this.$message('使用承诺的数额需大于0');
+        this.$message.error('使用承诺的数额需大于0');
         return
       }
       if (!this.spend) {
-        this.$message('请填写要转出的数额');
+        this.$message.error('请填写要转出的数额');
         return
       }
       const spend = parseInt(this.spend)
       if (spend === 0) {
-        this.$message('要转出的数额需大于0');
+        this.$message.error('要转出的数额需大于0');
         return
       }
       if (this.transmoney < this.spend) {
-        this.$message('转出数额不可大于使用承诺的数额');
+        this.$message.error('转出数额不可大于使用承诺的数额');
         return
       }
-      if (!this.moneyProm) {
-        this.$message('请填写承诺cmv');
+      if (!this.cmv) {
+        this.$message.error('请填写承诺cmv');
         return
       }
       if (!this.r) {
-        this.$message('请填写承诺随机数vor');
+        this.$message.error('请填写承诺随机数vor');
         return
       }
       const pri = this.getPri();
@@ -263,10 +297,12 @@ export default {
         rg2: this.G2,
         rp: this.P,
         rh: this.pub,
-        cmv: this.moneyProm,
+        cmv: this.cmv,
         vor: this.r,
         spend: spend
       }).then((response) => {
+        this.abolitionCM(this.cmv)
+        response.data.coin.valuable = true
         this.storeInfo(response, -this.spend);
       }).catch((response) => {
         this.$message.error(response);
@@ -301,6 +337,8 @@ export default {
         },
         timeout: '600000'
       }).then((response) => {
+        response.data.coin.valuable = true
+        console.log(response)
         this.storeInfo(response, this.money);
       }).catch((response) => {
         this.$message.error(response);
@@ -380,11 +418,12 @@ export default {
     },
     showInfof() {
       this.showCoin();
-      var G1 = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).info.G1);
-      var G2 = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).info.G2);
-      var P = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).info.P);
-      var pub = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).info.publickey);
-      var pri = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).info.privatekey);
+      const accountInfo = (JSON.parse(window.localStorage.getItem(account))).info
+      var G1 = JSON.stringify(accountInfo.G1);
+      var G2 = JSON.stringify(accountInfo.G2);
+      var P = JSON.stringify(accountInfo.P);
+      var pub = JSON.stringify(accountInfo.publickey);
+      var pri = JSON.stringify(accountInfo.privatekey);
       this.$alert("<p>G1:" + G1 + "</p>" +
           "<p>G2:" + G2 + "</p>" +
           "<p>P:" + P + "</p>" +
@@ -421,7 +460,7 @@ export default {
         }
       }
       // 上当了,因为少了个s找了好久问题
-      this.$refs.n.changenm(sum);
+      this.$refs.n.changeSum(sum);
     },
     // 改变展示状态
     progress() {

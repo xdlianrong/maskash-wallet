@@ -8,6 +8,7 @@ import (
 	"github.com/urfave/cli"
 	"os"
 	"os/signal"
+	"strconv"
 	"time"
 	"wallet/controllers"
 	"wallet/model"
@@ -37,7 +38,7 @@ func main() {
 	}
 }
 func wallet(ctx *cli.Context) {
-	model.Ethurl = "http://" + ctx.String("ethIP") + ":8545"
+	model.Ethurl = "http://" + ctx.String("ethIP") + ":" + strconv.Itoa(model.EthPort)
 	controllers.ExchangeURL = "http://" + ctx.String("exchangeIP") + ":1323/"
 	controllers.RegulatorURL = "http://" + ctx.String("regulatorIP") + ":1423/"
 	_ = startNetwork(ctx)
