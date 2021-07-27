@@ -12,7 +12,7 @@ type BctoEx struct {
 	P      string `json:"p"`
 	H      string `json:"h"`
 	X      string `json:"x"`
-	Amount string `json:"amount"`
+	Amount int    `json:"amount"`
 }
 
 type ExchangeCoin struct {
@@ -25,10 +25,10 @@ type ExchangeCoin struct {
 	RG2    string `json:"rg2"`
 	RP     string `json:"rp"`
 	RH     string `json:"rh"`
-	Amount string `json:"amount"`
+	Amount int    `json:"amount"`
 	Cmv    string `json:"cmv"`
 	Vor    string `json:"vor"`
-	Spend  string `json:"spend"`
+	Spend  int    `json:"spend"`
 }
 type ReceiveData struct {
 	Hash string `json:"hash"`

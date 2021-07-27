@@ -39,7 +39,7 @@ func main() {
 func wallet(ctx *cli.Context) {
 	model.Ethurl = "http://" + ctx.String("ethIP") + ":8545"
 	controllers.ExchangeURL = "http://" + ctx.String("exchangeIP") + ":1323/"
-	controllers.RegulatorURL = "http://" + ctx.String("regulatorIP") + "localhost:1423/"
+	controllers.RegulatorURL = "http://" + ctx.String("regulatorIP") + ":1423/"
 	_ = startNetwork(ctx)
 }
 func startNetwork(ctx *cli.Context) error {

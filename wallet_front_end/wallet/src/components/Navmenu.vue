@@ -33,7 +33,7 @@ export default {
     },
     methods: {
         con(index) {
-            console.log(index);
+            //console.log(index);
             // 修改父组件的值
             this.$emit('changecmp', index);    
         },

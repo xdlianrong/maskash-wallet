@@ -97,7 +97,7 @@ type Coin struct {
 	Cmv    string `json:"cmv"`
 	Vor    string `json:"vor"`
 	Hash   string `json:"hash"`
-	Amount string `json:"amount"`
+	Amount int    `json:"amount"`
 }
 type RPCtx struct {
 	Jsonrpc string `json:"jsonrpc"`
@@ -125,62 +125,62 @@ type RPCtx struct {
 		CMRpk            string `json:"cmrpk"`
 		CMSpk            string `json:"cmspk"`
 		RpkEPg1          string `json:"rpkepg1"` //接收方地址公钥相等证明字段g1
-		RpkEPg2      	 string `json:"rpkepg2"` //接收方地址公钥相等证明字段g2
-		RpkEPy1     	 string `json:"rpkepy1"` //接收方地址公钥相等证明字段y1
-		RpkEPy2    	     string `json:"rpkepy2"` //接收方地址公钥相等证明字段y2
-		RpkEPt1      	 string `json:"rpkept1"` //接收方地址公钥相等证明字段t1
-		RpkEPt2      	 string `json:"rpkept2"` //接收方地址公钥相等证明字段t2
-		RpkEPs       	 string `json:"rpkeps"` //接收方地址公钥相等证明字段s
-		RpkEPc       	 string `json:"rpkepc"` //接收方地址公钥相等证明字段c
-		SpkEPg1      	 string `json:"spkepg1"` //发送方地址公钥相等证明字段g1
-		SpkEPg2      	 string `json:"spkepg2"` //发送方地址公钥相等证明字段g2
-		SpkEPy1      	 string `json:"spkepy1"` //发送方地址公钥相等证明字段y1
-		SpkEPy2      	 string `json:"spkepy2"` //发送方地址公钥相等证明字段y2
-		SpkEPt1      	 string `json:"spkept1"` //发送方地址公钥相等证明字段t1
-		SpkEPt2      	 string `json:"spkept2"` //发送方地址公钥相等证明字段t2
-		SpkEPs       	 string `json:"spkeps"` //发送方地址公钥相等证明字段s
-		SpkEPc       	 string `json:"spkepc"` //发送方地址公钥相等证明字段c
+		RpkEPg2          string `json:"rpkepg2"` //接收方地址公钥相等证明字段g2
+		RpkEPy1          string `json:"rpkepy1"` //接收方地址公钥相等证明字段y1
+		RpkEPy2          string `json:"rpkepy2"` //接收方地址公钥相等证明字段y2
+		RpkEPt1          string `json:"rpkept1"` //接收方地址公钥相等证明字段t1
+		RpkEPt2          string `json:"rpkept2"` //接收方地址公钥相等证明字段t2
+		RpkEPs           string `json:"rpkeps"`  //接收方地址公钥相等证明字段s
+		RpkEPc           string `json:"rpkepc"`  //接收方地址公钥相等证明字段c
+		SpkEPg1          string `json:"spkepg1"` //发送方地址公钥相等证明字段g1
+		SpkEPg2          string `json:"spkepg2"` //发送方地址公钥相等证明字段g2
+		SpkEPy1          string `json:"spkepy1"` //发送方地址公钥相等证明字段y1
+		SpkEPy2          string `json:"spkepy2"` //发送方地址公钥相等证明字段y2
+		SpkEPt1          string `json:"spkept1"` //发送方地址公钥相等证明字段t1
+		SpkEPt2          string `json:"spkept2"` //发送方地址公钥相等证明字段t2
+		SpkEPs           string `json:"spkeps"`  //发送方地址公钥相等证明字段s
+		SpkEPc           string `json:"spkepc"`  //发送方地址公钥相等证明字段c
 		EvSC1            string `json:"evsc1"`
 		EvSC2            string `json:"evsc2"`
 		EvRC1            string `json:"evrc1"`
 		EvRC2            string `json:"evrc2"`
 		CmS              string `json:"cms"`
 		CmR              string `json:"cmr"`
-		ScmFPg1      	 string `json:"scmfpg1"` //发送金额承诺格式证明字段g1
-		ScmFPg2      	 string `json:"scmfpg2"` //发送金额承诺格式证明字段g2
-		ScmFPy1      	 string `json:"scmfpy1"` //发送金额承诺格式证明字段y1
-		ScmFPy2      	 string `json:"scmfpy2"` //发送金额承诺格式证明字段y2
-		ScmFPt1      	 string `json:"scmfpt1"` //发送金额承诺格式证明字段t1
-		ScmFPt2      	 string `json:"scmfpt2"` //发送金额承诺格式证明字段t2
-		ScmFPs       	 string `json:"scmfps"` //发送金额承诺格式证明字段s
-		ScmFPc       	 string `json:"scmfpc"` //发送金额承诺格式证明字段c
-		RcmFPg1      	 string `json:"rcmfpg1"` //接收金额承诺格式证明字段g1
-		RcmFPg2      	 string `json:"rcmfpg2"` //接收金额承诺格式证明字段g2
-		RcmFPy1      	 string `json:"rcmfpy1"` //接收金额承诺格式证明字段y1
-		RcmFPy2      	 string `json:"rcmfpy2"` //接收金额承诺格式证明字段y2
-		RcmFPt1      	 string `json:"rcmfpt1"` //接收金额承诺格式证明字段t1
-		RcmFPt2      	 string `json:"rcmfpt2"` //接收金额承诺格式证明字段t2
-		RcmFPs       	 string `json:"rcmfps"` //接收金额承诺格式证明字段s
-		RcmFPc       	 string `json:"rcmfpc"` //接收金额承诺格式证明字段c
+		ScmFPg1          string `json:"scmfpg1"` //发送金额承诺格式证明字段g1
+		ScmFPg2          string `json:"scmfpg2"` //发送金额承诺格式证明字段g2
+		ScmFPy1          string `json:"scmfpy1"` //发送金额承诺格式证明字段y1
+		ScmFPy2          string `json:"scmfpy2"` //发送金额承诺格式证明字段y2
+		ScmFPt1          string `json:"scmfpt1"` //发送金额承诺格式证明字段t1
+		ScmFPt2          string `json:"scmfpt2"` //发送金额承诺格式证明字段t2
+		ScmFPs           string `json:"scmfps"`  //发送金额承诺格式证明字段s
+		ScmFPc           string `json:"scmfpc"`  //发送金额承诺格式证明字段c
+		RcmFPg1          string `json:"rcmfpg1"` //接收金额承诺格式证明字段g1
+		RcmFPg2          string `json:"rcmfpg2"` //接收金额承诺格式证明字段g2
+		RcmFPy1          string `json:"rcmfpy1"` //接收金额承诺格式证明字段y1
+		RcmFPy2          string `json:"rcmfpy2"` //接收金额承诺格式证明字段y2
+		RcmFPt1          string `json:"rcmfpt1"` //接收金额承诺格式证明字段t1
+		RcmFPt2          string `json:"rcmfpt2"` //接收金额承诺格式证明字段t2
+		RcmFPs           string `json:"rcmfps"`  //接收金额承诺格式证明字段s
+		RcmFPc           string `json:"rcmfpc"`  //接收金额承诺格式证明字段c
 		EvsBsC1          string `json:"evsbsc1"`
 		EvsBsC2          string `json:"evsbsc2"`
 		EvOC1            string `json:"evoc1"`
 		EvOC2            string `json:"evoc2"`
 		CmO              string `json:"cmo"`
-		VoEPg1       	 string `json:"voepg1"` //被花费承诺相等证明字段g1
-		VoEPg2       	 string `json:"voepg2"` //被花费承诺相等证明字段g2
-		VoEPy1       	 string `json:"voepy1"` //被花费承诺相等证明字段y1
-		VoEPy2       	 string `json:"voepy2"` //被花费承诺相等证明字段y2
-		VoEPt1       	 string `json:"voept1"` //被花费承诺相等证明字段t1
-		VoEPt2       	 string `json:"voept2"` //被花费承诺相等证明字段t2
-		VoEPs        	 string `json:"voeps"` //被花费承诺相等证明字段s
-		VoEPc        	 string `json:"voepc"` //被花费承诺相等证明字段c
-		BPy          	 string `json:"bpy"` //会计平衡证明字段y
-		BPt          	 string `json:"bpt"` //会计平衡证明字段t
-		BPsn1        	 string `json:"bpsn1"` //会计平衡证明字段sn1
-		BPsn2        	 string `json:"bpsn2"` //会计平衡证明字段sn2
-		BPsn3        	 string `json:"bpsn3"` //会计平衡证明字段sn3
-		BPc          	 string `json:"bpc"` //会计平衡证明字段c
+		VoEPg1           string `json:"voepg1"` //被花费承诺相等证明字段g1
+		VoEPg2           string `json:"voepg2"` //被花费承诺相等证明字段g2
+		VoEPy1           string `json:"voepy1"` //被花费承诺相等证明字段y1
+		VoEPy2           string `json:"voepy2"` //被花费承诺相等证明字段y2
+		VoEPt1           string `json:"voept1"` //被花费承诺相等证明字段t1
+		VoEPt2           string `json:"voept2"` //被花费承诺相等证明字段t2
+		VoEPs            string `json:"voeps"`  //被花费承诺相等证明字段s
+		VoEPc            string `json:"voepc"`  //被花费承诺相等证明字段c
+		BPy              string `json:"bpy"`    //会计平衡证明字段y
+		BPt              string `json:"bpt"`    //会计平衡证明字段t
+		BPsn1            string `json:"bpsn1"`  //会计平衡证明字段sn1
+		BPsn2            string `json:"bpsn2"`  //会计平衡证明字段sn2
+		BPsn3            string `json:"bpsn3"`  //会计平衡证明字段sn3
+		BPc              string `json:"bpc"`    //会计平衡证明字段c
 		EpkrC1           string `json:"epkrc1"`
 		EpkrC2           string `json:"epkrc2"`
 		EpkpC1           string `json:"epkpc1"`

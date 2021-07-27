@@ -85,7 +85,6 @@ func register(account ecc.Account) (string, error) {
 	return string(body), nil
 }
 
-// 39.105.58.136
 func Buycoin(c echo.Context) error {
 	w := new(model.BctoEx)
 	if err := c.Bind(w); err != nil {
@@ -122,8 +121,8 @@ func ExchangeCoin(c echo.Context) error {
 		Vor:    w.Vor,
 		Amount: w.Amount,
 	}
-	amount, _ := strconv.Atoi(coin.Amount)
-	spend, _ := strconv.Atoi(w.Spend)
+	amount := coin.Amount
+	spend := w.Spend
 	if spend > amount {
 		return c.JSON(http.StatusOK, errors.New("转出金额不可大于承诺额"))
 	}
@@ -148,7 +147,7 @@ func ExchangeCoin(c echo.Context) error {
 		Cmv:    tx.CmR,
 		Vor:    decrypt(tx.CmRRC1, tx.CmRRC2, senderPriv),
 		Hash:   txHash,
-		Amount: strconv.Itoa(amount - spend),
+		Amount: amount - spend,
 	}
 	return c.JSON(http.StatusOK, returnCoin)
 }
@@ -166,15 +165,17 @@ func Receive(c echo.Context) error {
 		return c.JSON(http.StatusOK, err.Error())
 	}
 	tx := rpcTx.Result
+	amountHex := decryptValue(tx.EvsBsC1, tx.EvsBsC2, privKey)
+	s, _ := strconv.ParseInt(amountHex, 0, 32)
 	returnCoin := utils.Coin{
 		Cmv:    tx.CmO,
 		Vor:    decrypt(tx.CmSRC1, tx.CmSRC2, privKey),
 		Hash:   w.Hash,
-		Amount: decryptValue(tx.EvsBsC1, tx.EvsBsC2, privKey),
+		Amount: int(s),
 	}
 	return c.JSON(http.StatusOK, returnCoin)
 }
-func decryptCoinReceipt(recript utils.Receipt, priv ecc.PrivateKey, amount string) utils.Coin {
+func decryptCoinReceipt(recript utils.Receipt, priv ecc.PrivateKey, amount int) utils.Coin {
 	return utils.Coin{
 		Cmv:    recript.Cmv,
 		Vor:    decrypt(recript.Epkrc1, recript.Epkrc2, priv),

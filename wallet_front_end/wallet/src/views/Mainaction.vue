@@ -3,7 +3,7 @@
     <navmenu @changecmp="changecmps" ref="n"></navmenu>
     <el-row type="flex" justify="center" id="om">
       <el-col :xs="20" :sm="15" :md="8" :lg="8" :xl="8" v-show="cmp !== 4">
-        <div v-show="cmp == 1">
+        <div v-show="cmp === 1">
           <p>购买数额:</p>
           <el-input maxlength="10" v-model="money" oninput="value=value.replace(/[^\d]/g,'')"></el-input>
           <mybutton :buttonMsg="buy" @click.native="buym"></mybutton>
@@ -33,57 +33,57 @@
           <mybutton :buttonMsg="transfer" @click.native="transferm" style="margin-bottom: 20px"></mybutton>
         </div>
 
-            <div v-show="cmp == 3">
-                 <p>交易hash</p>
-                <el-input v-model="hash" ></el-input>
-                <mybutton :buttonMsg="recv" @click.native="recm"></mybutton>
-            </div>
-            
-            <div v-show="cmp == 5">
-                <mybutton :buttonMsg="showImfo" @click.native="showImfof" class="b1"></mybutton>
-                <mybutton :buttonMsg="signout" @click.native="signoutf"></mybutton>
-            </div>
-            </el-col>
-            
-        </el-row>
-        <el-row v-show="cmp == 4" type="flex" justify="center">
-            <el-col :xs="24" :sm="20" :md="17" :lg="15" :xl="15" >
-                <el-table  :data="hisList" >
-                    <el-table-column
-                        prop="amount"
-                        label="数额">
-                    </el-table-column>
-                    <el-table-column
-                        prop="hash"
-                        label="哈希hash">
-                    </el-table-column>
-                    <el-table-column
-                        prop="cmv"
-                        label="承诺cmv">
-                    </el-table-column>
-                    <el-table-column
-                        prop="vor"
-                        label="随机数vor">
-                    </el-table-column>
-                </el-table>
-            </el-col>    
-        </el-row>
-
-        <div id="progress" v-show="cmp == 1 && show">
-					<el-timeline>
-						<el-timeline-item
-						v-for="(activity, index) in activities"
-						:key="index"
-						:icon="activity.icon"
-						:type="activity.type"
-						:color="activity.color"
-						:size="activity.size"
-						:timestamp="activity.timestamp">
-						{{activity.content}}
-						</el-timeline-item>
-					</el-timeline>
+        <div v-show="cmp === 3">
+          <p>交易hash</p>
+          <el-input v-model="hash"></el-input>
+          <mybutton :buttonMsg="recv" @click.native="recm"></mybutton>
         </div>
+
+        <div v-show="cmp === 5">
+          <mybutton :buttonMsg="showInfo" @click.native="showInfof" class="b1"></mybutton>
+          <mybutton :buttonMsg="signout" @click.native="signoutf"></mybutton>
+        </div>
+      </el-col>
+
+    </el-row>
+    <el-row v-show="cmp === 4" type="flex" justify="center">
+      <el-col :xs="24" :sm="20" :md="17" :lg="15" :xl="15">
+        <el-table :data="hisList">
+          <el-table-column
+              prop="amount"
+              label="数额">
+          </el-table-column>
+          <el-table-column
+              prop="hash"
+              label="哈希hash">
+          </el-table-column>
+          <el-table-column
+              prop="cmv"
+              label="承诺cmv">
+          </el-table-column>
+          <el-table-column
+              prop="vor"
+              label="随机数vor">
+          </el-table-column>
+        </el-table>
+      </el-col>
+    </el-row>
+
+    <div id="progress" v-show="cmp === 1 && show">
+      <el-timeline>
+        <el-timeline-item
+            v-for="(activity, index) in activities"
+            :key="index"
+            :icon="activity.icon"
+            :type="activity.type"
+            :color="activity.color"
+            :size="activity.size"
+            :timestamp="activity.timestamp">
+          {{ activity.content }}
+        </el-timeline-item>
+      </el-timeline>
     </div>
+  </div>
 </template>
 <script>
 import navmenu from '../components/Navmenu'
@@ -99,11 +99,12 @@ export default {
   },
   data() {
     return {
+      showLog: globle.showLog,
       transfer: '发起转出',
       buy: '兑换',
       recv: '接收',
       signout: '登出',
-      showImfo: '显示账户信息',
+      showInfo: '显示账户信息',
       money: '',
       cmp: '1', // 用来改变显示的组件
       transmoney: '',
@@ -121,21 +122,21 @@ export default {
       baccount: '',
       loading: true,
       show: false,
-			activities: [{
-				content: '开始转出'
-			},{
-				content: '生成会计平衡证明'
-			},{
-				content: '生成相等证明'
-			},{
-				content: '生成范围证明'
-			},{
-				content: '生成格式正确证明'
-			},{
-				content: '挖矿共识'
-			},{
-				content: '转出成功'
-			}]
+      activities: [{
+        content: '开始转出'
+      }, {
+        content: '生成会计平衡证明'
+      }, {
+        content: '生成相等证明'
+      }, {
+        content: '生成范围证明'
+      }, {
+        content: '生成格式正确证明'
+      }, {
+        content: '挖矿共识'
+      }, {
+        content: '转出成功'
+      }]
     }
   },
   created: function () {
@@ -156,7 +157,8 @@ export default {
   },
   mounted: function () {
     this.showCoin();
-    console.log("???");
+    if (this.showLog)
+      console.log("???");
     // 获取本地账户列表
     for (let i = 0; i < window.localStorage.length; i++) {
       const name = window.localStorage.key(i);
@@ -174,8 +176,9 @@ export default {
         this.P = '';
         this.pub = '';
       } else {
-        const b = JSON.parse(window.localStorage.getItem(val)).imfo;
-        console.log(b);
+        const b = JSON.parse(window.localStorage.getItem(val)).info;
+        if (this.showLog)
+          console.log(b);
         this.G1 = b.G1;
         this.G2 = b.G2;
         this.P = b.P;
@@ -185,7 +188,23 @@ export default {
   },
   methods: {
     getPri() {
-      return JSON.parse(window.localStorage.getItem(account)).imfo;
+      return JSON.parse(window.localStorage.getItem(account)).info;
+    },
+    storeInfo(response, amount) {
+      // 更新信息
+      // 取出 history 并修改
+      if (this.showLog)
+        console.log("?");
+      var old = JSON.parse(window.localStorage.getItem(account));
+      var neww = response.data;
+      neww.vm = amount;
+      old.history.push(neww); // 喜加一
+      if (this.showLog)
+        console.log(neww);
+      window.localStorage.setItem(account, JSON.stringify(old));
+      if (this.showLog)
+        console.log(window.localStorage.getItem(account));
+      this.showCoin();
     },
     Pub(G1, G2, P, H) {
       this.G1 = G1;
@@ -194,17 +213,29 @@ export default {
       this.H = H;
     },
     transferm() {
-      console.log("我要转账");
-      if (!this.G1 || !this.G2 || !this.P || !this.H) {
+      if (this.showLog)
+        console.log("我要转账");
+      if (!this.G1 || !this.G2 || !this.P || !this.pub) {
         this.$message('请完整输入接收方公钥账户');
         return
       }
+
       if (!this.transmoney) {
         this.$message('请填写使用承诺的数额');
         return
       }
+      const amount = parseInt(this.transmoney)
+      if (amount === 0) {
+        this.$message('使用承诺的数额需大于0');
+        return
+      }
       if (!this.spend) {
         this.$message('请填写要转出的数额');
+        return
+      }
+      const spend = parseInt(this.spend)
+      if (spend === 0) {
+        this.$message('要转出的数额需大于0');
         return
       }
       if (this.transmoney < this.spend) {
@@ -221,29 +252,30 @@ export default {
       }
       const pri = this.getPri();
       this.$message('正在生成：会计平衡证明、监管相等证明、范围证明、密文格式正确证明');
-      this.axios.post('http://' + globle.serverIp +'/wallet/exchange', {
+      this.axios.post('http://' + globle.serverIp + '/wallet/exchange', {
         sg1: pri.G1,
         sg2: pri.G2,
         sp: pri.P,
         sh: pri.publickey,
         sx: pri.privatekey,
-        amount: this.transmoney,
+        amount: amount,
         rg1: this.G1,
         rg2: this.G2,
         rp: this.P,
         rh: this.pub,
         cmv: this.moneyProm,
         vor: this.r,
-        spend: this.spend
+        spend: spend
       }).then((response) => {
-        this.storeImfo(response, -this.spend);
+        this.storeInfo(response, -this.spend);
       }).catch((response) => {
         this.$message.error(response);
-        console.log(response);
+        console.error(response);
       });
     },
     buym() {
-      console.log("我要兑换");
+      if (this.showLog)
+        console.log("我要兑换");
       if (!this.money) {
         this.$message.error("请填写要兑换的金额");
         return
@@ -254,7 +286,8 @@ export default {
         return
       }
       const pri = this.getPri();
-      console.log(pri.privatekey);
+      if (this.showLog)
+        console.log(pri.privatekey);
       this.axios({
         url: 'http://' + globle.serverIp + '/wallet/buycoin',
         method: 'post',
@@ -268,10 +301,10 @@ export default {
         },
         timeout: '600000'
       }).then((response) => {
-        this.storeImfo(response, this.money);
+        this.storeInfo(response, this.money);
       }).catch((response) => {
         this.$message.error(response);
-        console.log(response);
+        console.error(response);
       });
       this.show = true;
       this.progress();
@@ -287,12 +320,12 @@ export default {
       // }, 2000);
     },
     recm() {
-      console.log("我要收款");
+      if (this.showLog)
+        console.log("我要收款");
       if (this.hash.length === 0) {
         this.$message.error("请填写交易hash");
         return
       }
-
       if (this.hash.length !== 66) {
         this.$message.error("未找到指定交易");
         return
@@ -311,15 +344,15 @@ export default {
         },
         timeout: '600000'
       }).then((response) => {
-        if (isNaN(response.data.vm) || isNaN(response.data.amount)) {
-          this.$message.error("未找到指定交易");
+        if (isNaN(response.data.amount)) {
+          this.$message.error("交易解密失败");
           return
         }
-        response.data.amount = parseInt(response.data.amount);
-        this.storeImfo(response, parseInt(response.data.amount));
+        this.storeInfo(response, response.data.amount);
+        this.$message.info("接收成功！");
       }).catch((response) => {
         this.$message.error(response);
-        console.log(response);
+        console.error(response);
       });
     },
     changecmps(index) {
@@ -345,13 +378,13 @@ export default {
         path: '/'
       })
     },
-    showImfof() {
+    showInfof() {
       this.showCoin();
-      var G1 = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.G1);
-      var G2 = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.G2);
-      var P = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.P);
-      var pub = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.publickey);
-      var pri = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).imfo.privatekey);
+      var G1 = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).info.G1);
+      var G2 = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).info.G2);
+      var P = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).info.P);
+      var pub = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).info.publickey);
+      var pri = JSON.stringify((JSON.parse(window.localStorage.getItem(account))).info.privatekey);
       this.$alert("<p>G1:" + G1 + "</p>" +
           "<p>G2:" + G2 + "</p>" +
           "<p>P:" + P + "</p>" +
@@ -361,7 +394,6 @@ export default {
         dangerouslyUseHTMLString: true,
         customClass: 'message_box_alert'
       });
-      window.localStorage.setItem(2, window.localStorage.getItem("1"));
 
       // var twqee = {
       //     hash: "ASBWJAKFA",
@@ -372,38 +404,42 @@ export default {
       // };
       // var old = JSON.parse(window.localStorage.getItem(account));            old.history.push(twqee); // 喜加一
       // window.localStorage.setItem(account, JSON.stringify(old));
-      // console.log(old);
+      // if(this.showLog)
+      //  console.log(old);
     },
     showCoin() {
       // 刷新余额
-      console.log("改余额");
+      if (this.showLog)
+        console.log("改余额");
       var sum = 0;
       var his = JSON.parse(window.localStorage.getItem(account)).history;
       for (var i = 0; i < his.length; i++) {
         if (his[i].vm !== undefined) {
           sum = sum + parseInt(his[i].vm);
-          console.log(sum);
+          if (this.showLog)
+            console.log(sum);
         }
       }
       // 上当了,因为少了个s找了好久问题
       this.$refs.n.changenm(sum);
     },
-		// 改变展示状态
-		progress() {
+    // 改变展示状态
+    progress() {
       var time = 0;
-			for (var i = 0; i < 7;i++) {
-        time = time + Math.random()*2000+1000;
+      for (var i = 0; i < 7; i++) {
+        time = time + Math.random() * 2000 + 1000;
         this.pc(i, time);
       }
-		},
+    },
     pc(i, time) {
       var state = document.getElementById("progress");
       setTimeout(() => {
         var ojArr = state.getElementsByTagName("li")[i].getElementsByTagName("div");
         ojArr[0].style.borderLeft = "2px solid limegreen";
         ojArr[1].style.backgroundColor = "limegreen";
-        console.log(ojArr[1]);
-        if (i == 7) {
+        if (this.showLog)
+          console.log(ojArr[1]);
+        if (i === 7) {
           setTimeout(() => {
             this.show = false;
           }, 1000);
@@ -433,20 +469,20 @@ export default {
 }
 
 #progress {
-  display : flex;
+  display: flex;
   margin-left: 70%;
   align-items: flex-end;
   flex-direction: column;
   transform: translateY(-25%);
-	width: 20%;
+  width: 20%;
 }
 
 .el-timeline-item {
-	padding-bottom: 50px !important;
+  padding-bottom: 50px !important;
 }
 
 .el-timeline {
-	font-size: 16px !important;
+  font-size: 16px !important;
 }
 </style>
 <style scoped>

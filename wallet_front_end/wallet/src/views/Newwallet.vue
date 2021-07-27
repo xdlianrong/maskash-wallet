@@ -1,7 +1,7 @@
 <template>
   <div id="o" class="main">
     <!-- 输入信息，需要用 el-col 实现响应式布局 -->
-    <div class="imfo">
+    <div class="info">
       <p style="margin-top: 0;">我们将通过您的银行信息为您生成账户公钥并在本地储存相关信息</p>
       <p style="font-size: 17px; color: #666666;">为保证您的账户安全，并让您在多个设备上打开您的账户，请及时备份并安全保管相关文件</p>
       <!--                    <p>文件储存地址为.....</p>-->
@@ -35,6 +35,7 @@ export default {
   },
   data() {
     return {
+      showLog: globle.showLog,
       bm: '创建账户',
       id: '',
       name: '',
@@ -44,26 +45,28 @@ export default {
   mounted: function () {
     // 小屏适配
     if (document.documentElement.clientHeight < 870) {
-      console.log(document.documentElement.clientHeight);
+      if (this.showLog)
+        console.log(document.documentElement.clientHeight);
       document.getElementById("o").style.top = "10px";
       document.getElementById("o").style.transform = "none";
     }
   },
   methods: {
-    Account(imfo) {
-      this.imfo = imfo;
+    Account(info) {
+      this.info = info;
       this.history = [];
     },
     register() {
       if (this.id === '' || this.name === '' || this.string === '') {
         this.$message.error('提交的信息不能为空');
       } else {
-        this.axios.post('http://' + globle.serverIp +'/wallet/register', {
+        this.axios.post('http://' + globle.serverIp + '/wallet/register', {
           name: this.name,
           id: this.id,
           str: this.string
         }).then((response) => {
-          console.log(response);
+          if (this.showLog)
+            console.log(response);
           this.$message.success({
             message: '创建成功',
             duration: 1500
@@ -72,7 +75,8 @@ export default {
           var storage = window.localStorage;
           response.data;
           storage.setItem(this.name, JSON.stringify(new this.Account(response.data)));
-          console.log(storage);
+          if (this.showLog)
+            console.log(storage);
           // 跳转
           setTimeout(() => {
             this.$router.push({
@@ -85,7 +89,7 @@ export default {
           }, 1500);
         }).catch((response) => {
           this.$message.error('创建失败，请重试');
-          console.log(response);
+          console.error(response);
         })
       }
     }
@@ -99,12 +103,12 @@ export default {
   transform: translateY(-50%);
 }
 
-.imfo {
+.info {
   text-align: center;
   margin-bottom: 34px;
 }
 
-.imfo p {
+.info p {
   margin-top: 19px;
 }
 
